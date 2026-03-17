@@ -1,0 +1,26 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Python (if write-scene skill is later added as Python)
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Claude Code local settings (user-specific, not shared)
+.claude/settings.local.json
+
+# Health check state (user-specific)
+.health-check.json
+
+# Debug output
+debug_output.txt
+
+# Metrics (user-specific, generated during use)
+metrics.json
