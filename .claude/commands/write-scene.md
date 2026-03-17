@@ -23,7 +23,7 @@ Draft a scene using your personal rules and quality gates, then refine until it 
 Before drafting, read the following files:
 
 1. **CLAUDE.md** — Writer's rules, voice, quality thresholds, language
-2. **config.yaml** — If exists: vault path, character voice patterns, style settings
+2. **config.yaml** (project root) — If exists: vault path, language, character voice patterns, style settings
 3. **Scene context** — From the user's input or vault:
    - Scene card from `2. Outlines/Scene Cards/`
    - Deep-dive beats from `2. Outlines/Deep Dive Beats/`

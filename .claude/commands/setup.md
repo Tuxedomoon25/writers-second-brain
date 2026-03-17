@@ -53,7 +53,8 @@ This determines your vault structure and available tools.
 ### Genre Branching Logic
 
 **If Fantasy/Sci-Fi/Mythology:**
-- Copy `vault-template-fantasy/` to the user's Obsidian location (includes World Bible sections)
+- Copy `vault-template/` to the user's Obsidian location (the standard vault structure)
+- ALSO copy `vault-template-fantasy/` contents into the same vault (adds sections 9-10: World Bible + Source Traditions)
 - Inform the user: "Great choice. Before we write scenes, we'll build your world first — like Tolkien spent years on Middle-earth before writing The Lord of the Rings. After this setup, your first command will be `/story-forge` in world-building mode."
 - Set `config.yaml` genre to `fantasy`
 
@@ -243,12 +244,34 @@ Update the CLAUDE.md in the project root with all answers:
 
 ### File 2: Create/Update config.yaml
 
-Create `.claude/skills/write-scene/config.yaml` based on the template at `.claude/skills/write-scene/templates/config-template.yaml`:
-- Set vault path
-- Set language and dialect
+Create `config.yaml` in the project root with the writer's settings:
+- Set vault path (where they copied the vault template to in Obsidian)
+- Set language (`en` or `nl`) and dialect (`flemish` or `dutch`)
 - Set quality thresholds from calibration
 - Set character profiles (empty, ready for /character-forge)
 - Set style rules (tense, adverbs tolerance, metaphor limit, etc.)
+- Set genre (literary, fantasy, thriller, etc.)
+
+Use this structure:
+```yaml
+vault:
+  path: "[absolute path to their Obsidian vault]"
+language: "en"  # or "nl"
+dialect: ""  # "flemish" or "dutch" (for nl only)
+genre: "[genre]"
+quality_thresholds:
+  show_dont_tell: 7
+  character_voice: 7
+  pacing_tension: 6
+  prose_style: 6
+style_rules:
+  tense: "simple_past"
+  adverbs: "zero_tolerance"
+  metaphors_per_paragraph: 1
+characters:
+  profiles: {}
+  voice_patterns: {}
+```
 
 ### File 3: Create memory/voice/style-rules.md
 

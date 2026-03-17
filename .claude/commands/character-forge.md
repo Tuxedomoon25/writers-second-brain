@@ -191,7 +191,7 @@ Synthesize into a complete Character Profile using the Character Template struct
 
 Save to `[vault]/4. Characters/[Name].md` using the Character Template format.
 
-Update the writer's config.yaml `characters.voice_patterns` section with the character's internal voice, dialogue pattern, and perceptual filter.
+Update the writer's `config.yaml` (project root) `characters.voice_patterns` section with the character's internal voice, dialogue pattern, and perceptual filter.
 
 ---
 
