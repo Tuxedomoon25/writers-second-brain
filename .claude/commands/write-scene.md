@@ -87,6 +87,18 @@ Check the scene-by-scene tone guide for this specific scene's:
 - Emotional key
 - Rhythm description
 
+### Step 5b: Load Mythology Hub (if configured)
+
+If CLAUDE.md specifies a `Hub Path` under a "Mythology Hub" section, load the shared mythology context:
+
+1. Read each file listed in the "Hub References" table (paths relative to Hub Path)
+2. Read the "Active Age File" for this novel's specific age/era
+3. Read character mythology profiles from the "Hub Characters" path if available
+
+These provide deep world-building context (creation myths, magic systems, force systems, cultural patterns) that enriches the scene without being exposed as exposition. The mythology should appear as **physics and sensation**, not as lore dumps.
+
+Include in the Scene Brief: **Mythology loaded:** [list of hub files loaded, or "No hub configured"]
+
 ### Step 6: Present the Brief
 
 Before drafting, show the writer what was loaded:
@@ -255,26 +267,32 @@ Rewrite flagged passages, preserving voice. Present changes:
 
 ## Phase 6: SAVE — Persist to Vault and Experiences
 
-### Step 1: Save to Manuscript
+**ALL steps in Phase 6 are MANDATORY. Do NOT skip any step. Do NOT move to the next scene until all 5 steps are confirmed complete.**
+
+### Step 1: Save to Manuscript (MANDATORY)
 
 Write the final scene to the manuscript vault:
 - Path: `[vault]/1. Manuscript/Act [N]/Chapter [N].md`
 - Append to existing chapter file or create new one
 - Use the scene header format from config
 
-### Step 2: Save to Experiences
+### Step 2: Save to Experiences (MANDATORY)
 
-Create the experience record:
+You MUST create the experience record. Use the Write tool to create these files:
+
 ```
 experiences/scenes/act[N]-ch[N]-scene[N]/
-├── draft.md           ← The final polished scene
-├── quality-review.md  ← Quality scores and findings
-└── learnings.md       ← Patterns worth remembering
+├── draft.md           ← The final polished scene text
+├── quality-review.md  ← Quality scores, violations found, strengths noted
+└── learnings.md       ← What worked well, what was tricky, patterns worth remembering
 ```
 
-### Step 3: Update Brain Health
+If the `experiences/scenes/` directory doesn't exist, create it. This is how `/recall` and `/grow` get their data.
 
-Add entry to `brain-health/growth-log.md`:
+### Step 3: Update Brain Health (MANDATORY)
+
+You MUST append an entry to `brain-health/growth-log.md`:
+
 ```
 ### [Date] - Scene Written: [Title]
 - Scores: Show/Tell [X], Voice [X], Pacing [X], Style [X]
@@ -283,17 +301,32 @@ Add entry to `brain-health/growth-log.md`:
 - Word count: [N]
 ```
 
-Update `brain-health/quality-metrics.md` with the new scores.
+You MUST also append the scores to `brain-health/quality-metrics.md`. This is how `/grow` shows trends.
 
-### Step 4: Update Task List
+### Step 4: Update Task List (MANDATORY)
 
-Mark the scene as complete in `0. Pre-write task list/Pre-write task list.md`.
+You MUST mark the scene as complete in the task list file (path specified in CLAUDE.md or config.yaml). Update the checkbox from `- [ ]` to `- [x]` and add word count and date.
 
-### Step 5: Extract Patterns (Optional)
+### Completion Checklist
 
-If the scene scored 8+ on any dimension, ask:
+Before moving to the next scene, confirm ALL of these out loud:
 
-> "This scene scored [X] on [dimension]. Want me to extract the technique as a pattern for future scenes?"
+> "Phase 6 complete:
+> 1. Manuscript saved to [path]
+> 2. Experience record created at experiences/scenes/[ref]/
+> 3. Growth log updated
+> 4. Quality metrics updated
+> 5. Task list updated"
+
+If any step was skipped, go back and complete it now.
+
+### Step 5: Extract Patterns (MANDATORY if any score 8+)
+
+**This step is NOT optional.** If any quality dimension scored 8 or higher, you MUST ask the writer:
+
+> "This scene scored [X] on [dimension]. The strongest technique was: [describe the specific craft move that earned the high score, with a quote from the scene].
+>
+> Want me to extract this as a pattern for future scenes?"
 
 If yes, add to the relevant `memory/patterns/` file with LOW confidence.
 

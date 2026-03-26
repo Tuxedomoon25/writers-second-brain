@@ -1,0 +1,26 @@
+# Writer's Second Brain — Project Configuration
+# Generated for: The Silence of the Bells
+
+vault:
+  path: "C:\\Users\\Timo\\Obsidian Vaults\\The Silence of the Bells"
+
+language: "en"
+dialect: ""
+genre: "fantasy"
+
+quality_thresholds:
+  show_dont_tell: 8
+  character_voice: 8
+  pacing_tension: 7
+  prose_style: 7
+
+style_rules:
+  tense: "simple_past"
+  adverbs: "zero_tolerance"
+  metaphors_per_paragraph: 1
+  positive_assertions: true
+  two_layer_rule: true
+  anti_abstraction: true
+
+target_word_count: 1500
+max_refinement_iterations: 5

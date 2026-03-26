@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "Adobe Photoshop": {
+      "command": "C:\\Python313\\Scripts\\uv.exe",
+      "args": [
+        "run",
+        "--with", "fonttools",
+        "--with", "mcp[cli]",
+        "--with", "numpy",
+        "--with", "pillow",
+        "--with", "python-socketio",
+        "--with", "requests",
+        "--with", "websocket-client",
+        "mcp", "run",
+        "C:\\Users\\Timo\\Desktop\\Projects\\adb-mcp\\mcp\\ps-mcp.py"
+      ]
+    },
+    "Adobe Photoshop Batch": {
+      "command": "C:\\Python313\\Scripts\\uv.exe",
+      "args": [
+        "run",
+        "--with", "fonttools",
+        "--with", "mcp[cli]",
+        "--with", "numpy",
+        "--with", "pillow",
+        "--with", "python-socketio",
+        "--with", "requests",
+        "--with", "websocket-client",
+        "mcp", "run",
+        "C:\\Users\\Timo\\Desktop\\Projects\\adb-mcp\\mcp\\ps-batch-play.py"
+      ]
+    },
+    "Adobe Illustrator": {
+      "command": "C:\\Python313\\Scripts\\uv.exe",
+      "args": [
+        "run",
+        "--with", "fonttools",
+        "--with", "mcp[cli]",
+        "--with", "numpy",
+        "--with", "pillow",
+        "--with", "python-socketio",
+        "--with", "requests",
+        "--with", "websocket-client",
+        "mcp", "run",
+        "C:\\Users\\Timo\\Desktop\\Projects\\adb-mcp\\mcp\\ai-mcp.py"
+      ]
+    }
+  }
+}

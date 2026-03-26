@@ -3,7 +3,9 @@
     "allow": [
       "Read(*)",
       "Glob(*)",
-      "Grep(*)"
+      "Grep(*)",
+      "Write(*)",
+      "Edit(*)"
     ]
   }
 }

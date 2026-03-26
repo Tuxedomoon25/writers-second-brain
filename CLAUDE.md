@@ -9,11 +9,11 @@
 
 <!-- Fill this in manually or run /setup to generate it automatically -->
 
-- **Name**: [Your name]
-- **Novel**: [Working title]
-- **Genre**: [Genre/subgenre]
-- **Language**: [en/nl]
-- **Dialect**: [For Dutch: flemish/dutch. For English: leave blank]
+- **Name**: Timo
+- **Novel**: The Silence of the Bells (Age 6 of The Sung World)
+- **Genre**: Fantasy (mythology-grounded, C.S. Lewis-inflected)
+- **Language**: en
+- **Dialect**:
 
 ## My Writing Voice
 
@@ -58,17 +58,37 @@
 
 ## Vault Path
 
-<!-- Absolute path to your Obsidian vault -->
-[e.g., C:\Users\YourName\Obsidian Vaults\My Novel]
+C:\Users\Timo\Obsidian Vaults\The Silence of the Bells
 
 ## Key Paths
 
 | What | Path |
 |------|------|
-| Vault | [path to vault] |
-| Manuscript | [vault]/1. Manuscript |
-| Characters | [vault]/4. Characters |
-| Outlines | [vault]/2. Outlines |
+| Vault | C:\Users\Timo\Obsidian Vaults\The Silence of the Bells |
+| Manuscript | C:\Users\Timo\Obsidian Vaults\The Silence of the Bells\1. Manuscript |
+| Characters | C:\Users\Timo\Obsidian Vaults\The Silence of the Bells\4. Characters |
+| Outlines | C:\Users\Timo\Obsidian Vaults\The Silence of the Bells\2. Outlines |
+| Settings | C:\Users\Timo\Obsidian Vaults\The Silence of the Bells\5. Settings |
+
+## Mythology Hub (Optional — for series with shared world-building)
+
+<!-- If your novel is part of a series with a shared mythology/world-building vault, configure the hub here. The /write-scene command will load these files as additional context. Leave blank if not applicable. -->
+
+- **Hub Path**: C:\Users\Timo\Obsidian Vaults\The Sung World
+- **Hub References**:
+
+| Reference | Path (relative to hub) |
+|-----------|------------------------|
+| Nine Forces | 1. World Bible/05 - The Nine Forces.md |
+| Magic System | 1. World Bible/09 - Magic System.md |
+| Covenant Cycle | 1. World Bible/04 - The Covenant Cycle.md |
+| Cosmogony | 1. World Bible/01 - Cosmogony.md |
+| Discord | 1. World Bible/02 - The Discord.md |
+| Drift | 1. World Bible/03 - The Drift.md |
+| Ghent Cycle Bridge | 1. World Bible/11 - The Ghent Cycle Bridge.md |
+
+- **Active Age File**: 1. World Bible/06 - The Ages/Age 6 - The Ghent Age.md
+- **Hub Characters**: 3. Characters/Ghent Cycle/
 
 ---
 
@@ -84,6 +104,8 @@
 | `/humanize` | Remove AI-typical patterns | Final polish |
 | `/recall` | Search writing memory | Looking for past patterns |
 | `/grow` | View writing growth metrics | Tracking progress |
+| `/format-fiction` | Export fiction manuscript to Atticus/InDesign .docx | Ready to format for print |
+| `/format-nonfiction` | Export nonfiction manuscript to Atticus/InDesign .docx | Ready to format for print |
 
 ## Repository Navigation
 
@@ -94,6 +116,59 @@
 | Brain Health | `brain-health/` | Writing growth metrics |
 | Reference | `reference/` | Bundled craft knowledge |
 | Demo | `demo/` | Example system for inspiration |
+| Scripts | `scripts/` | Formatting pipeline (Python + InDesign JSX) |
+| Scripts/lib | `scripts/lib/` | Shared parser for fiction and nonfiction |
+| Scripts/InDesign | `scripts/indesign/` | Parameterized InDesign automation (7 JSX scripts) |
+
+## Craft Rules (Enforced During Drafting)
+
+These rules were discovered through Act 1 and Act 2 reviews. They MUST be checked during `/write-scene` drafting, not just during revision.
+
+### Rule 11: Within-Chapter Somatic Rotation
+- No somatic tell may repeat within the same chapter
+- Check the scene's somatic ledger before writing
+
+### Rule 12: Cross-Chapter Somatic Rotation
+- No somatic ZONE (jaw, chest, hands, eyes) may be used as a fear-tell more than 3x across an entire Act
+- Song vibration path (molars -> sternum -> bones) is exempt as mythology, not fear-response
+- Before drafting, consult the Act's somatic ledger
+
+### Rule 13: Simile Uniqueness
+- No simile may appear verbatim more than once across the entire manuscript
+- "The way a [X]..." structure: max 5x per Act
+- Before using "the way a [X]..." check previous scenes in the Act
+
+### Rule 14: "As though" Budget
+- Max 3 "as though" / "as if" constructions per scene (~25 per Act)
+- When the mythic layer can be stated as fact or connected with an em-dash, do so
+
+### Rule 15: "Forgotten" Construction Limit
+- "[X] had forgotten [Y]" (Drift as amnesia): max 3x per Act
+- Alternatives: "lost," "shed," "no longer knew," or describe the result without the amnesia frame
+
+### Rule 16: Scene-Opening Somatic Variety
+- No somatic zone may be used as the opening tell in more than 2 chapters per Act
+- Before drafting Scene 1 of a new chapter, check the Act's opening-tell ledger
+
+### Rule 17: "Pressed against" Budget
+- "Pressed/pressing against" may appear at most 5x per Act
+- Alternatives: "bore down on," "settled into," "leaned against," "drove into," "weighed on"
+
+### Rule 18: Character Name Lock
+- All character names must be locked before drafting begins
+- Any name change mid-draft must be propagated to ALL previous chapters before the next scene is written
+- Maintain a character manifest in the Pre-write task list
+
+### Character Manifest (Locked Names)
+
+| Character | Name | Species | Role |
+|-----------|------|---------|------|
+| The Engineer | Sam | Human (14) | Protagonist |
+| The Mystic | Maya | Human (12) | Protagonist |
+| The Guide | Baldwin | Badger (bipedal) | Mentor/Guardian |
+| The Chronicler | Sox | Brown Hare | Comic Relief/Scribe |
+| The Weaver | The Weaver | Faceless entity | Antagonist |
+| The Resonant | Cole | TBD | Act 3 catalyst |
 
 ## Best Practices
 
