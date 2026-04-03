@@ -43,6 +43,31 @@
 - **Correct**: [...]
 - **Wrong**: [...]
 
+### Rule 4: No Negative Constructions
+- **Rule**: Avoid "not X, but Y" constructions. State what things ARE, not what they aren't.
+- **Why**: Negative constructions weaken prose by asking the reader to imagine the wrong thing first. Positive assertions hit harder.
+- **Correct**: "The creature dissolved — into _nothing_."
+- **Wrong**: "The creature dissolved. Not into dust, not into ash — into _nothing_."
+- **Exception**: When the negative construction does mythological or structural work that cannot be achieved otherwise (e.g., naming The Ache for the first time: "It was not sadness. It was something older.")
+
+### Rule 5: British English Spelling
+- **Rule**: British English spelling throughout (colour, grey, centre, metre, travelled, etc.)
+- **Why**: European setting (Ghent, Belgium). Consistent with the protagonist's nationality and the novel's geography.
+- **Correct**: "The colours held." / "He travelled three metres."
+- **Wrong**: "The colors held." / "He traveled three meters."
+
+### Rule 6: Imperial System (UK-style)
+- **Rule**: Imperial units for prose measurements (feet, yards, miles, pounds, inches). Celsius for temperature. Scientific constants may stay metric (speed of sound, density, conductivity).
+- **Why**: The family is British (expats in Ghent). Sam grew up in England and thinks in feet and pounds. Imperial units also carry more poetic texture in prose ("three feet" > "a metre").
+- **Correct**: "A hundred and forty pounds of fourteen-year-old engineer." / "Twenty-one degrees Celsius."
+- **Wrong**: "Sixty-four kilograms of fourteen-year-old engineer." / "Seventy degrees Fahrenheit."
+
+### Rule 7: Dash Convention (UK-style)
+- **Rule**: Use spaced en dash ( – ) for parenthetical asides, appositives, and connecting clauses. Reserve unspaced em dash (—) for interrupted/cut-off speech, cut-off internal thoughts, and action beats that interrupt dialogue mid-sentence.
+- **Why**: UK publishing convention (Penguin, OUP, Cambridge). The spaced en dash gives breathing room on the page; the em dash's abruptness is reserved for the specific violence of interruption. Fits the novel's British English register.
+- **Correct**: "The city felt thinner out here – thinner and colder and stripped of grain." / "The stones are hollow, Sammy! The math resolves to—" / "But a parabolic reflector—" he jabbed at the focal point—"concentrates the energy."
+- **Wrong**: "The city felt thinner out here—thinner and colder and stripped of grain." / "The stones are hollow, Sammy! The math resolves to –"
+
 <!-- Add up to 10 rules. Quality is more important than quantity. -->
 
 ## Quality Thresholds
@@ -161,10 +186,12 @@ These rules were discovered through Act 1 and Act 2 reviews. They MUST be checke
 
 ### Character Manifest (Locked Names)
 
+**Family background:** British expats in Ghent. Father was a professor of Medieval Literature at Cambridge before accepting a position in Belgium. The family grew up in England — Sam and Maya think in feet, yards, and pounds. **Father is alive but broken** — physically present but dissolving, thinning, sitting in the dark. He IS the Drift in human form. Not dead, not absent — dormant.
+
 | Character | Name | Species | Role |
 |-----------|------|---------|------|
-| The Engineer | Sam | Human (14) | Protagonist |
-| The Mystic | Maya | Human (12) | Protagonist |
+| The Engineer | Sam | Human (14), British | Protagonist |
+| The Mystic | Maya | Human (12), British | Protagonist |
 | The Guide | Baldwin | Badger (bipedal) | Mentor/Guardian |
 | The Chronicler | Sox | Brown Hare | Comic Relief/Scribe |
 | The Weaver | The Weaver | Faceless entity | Antagonist |

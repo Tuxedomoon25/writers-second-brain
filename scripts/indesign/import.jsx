@@ -49,11 +49,15 @@ var MARGIN_OUTSIDE = CFG.margins.outside_in + "in";
 // Style names
 var WORD_CHAPTER_NUMBER = "ChapterNumber";
 var WORD_CHAPTER_TITLE = "ChapterTitle";
+var WORD_PART_TITLE = "PartTitle";
+var WORD_PART_SUBTITLE = "PartSubtitle";
 var WORD_SCENE_BREAK = "SceneBreak";
 var WORD_NORMAL = "Normal";
 
 var ID_CHAPTER_NUMBER = "Chapter Number";
 var ID_CHAPTER_TITLE = "Chapter Title";
+var ID_PART_TITLE = "Part Title";
+var ID_PART_SUBTITLE = "Part Subtitle";
 var ID_BODY_TEXT = "Body Text";
 var ID_BODY_NO_INDENT = "Body Text - No Indent";
 var ID_SCENE_BREAK = "Scene Break";
@@ -73,9 +77,10 @@ function main() {
         var doc = step1_createDoc();
         step2_importStyles(doc);
         step3_createChapterNumberStyle(doc);
+        step3b_createPartStyles(doc);
         step4_placeDocx(doc);
-        var stats = step5_remapStyles(doc);
         step6_safetyPass(doc);
+        var stats = step5_remapStyles(doc);
         step7_cleanup(doc);
         step8_postProcess(doc);
         step9_save(doc);
@@ -89,6 +94,8 @@ function main() {
               "Style mapping:\n" +
               "  Chapter Numbers: " + stats.chapterNumbers + "\n" +
               "  Chapter Titles: " + stats.chapterTitles + "\n" +
+              "  Part Titles: " + stats.partTitles + "\n" +
+              "  Part Subtitles: " + stats.partSubtitles + "\n" +
               "  Scene Breaks: " + stats.sceneBreaks + "\n" +
               "  Body Text: " + stats.bodyText + "\n" +
               "  First Paragraphs: " + stats.firstParas + "\n\n" +
@@ -164,6 +171,37 @@ function step3_createChapterNumberStyle(doc) {
     style.startParagraph = StartParagraph.NEXT_ODD_PAGE;
 }
 
+function step3b_createPartStyles(doc) {
+    // Part Title style
+    try {
+        doc.paragraphStyles.itemByName(ID_PART_TITLE).name;
+    } catch (e) {
+        var baseStyle = null;
+        try { baseStyle = doc.paragraphStyles.itemByName(ID_CHAPTER_TITLE); } catch (e2) {}
+
+        var ptStyle = doc.paragraphStyles.add({ name: ID_PART_TITLE, basedOn: baseStyle });
+        ptStyle.pointSize = 36;
+        ptStyle.justification = Justification.CENTER_ALIGN;
+        ptStyle.spaceBefore = "2.5in";
+        ptStyle.spaceAfter = "0.25in";
+        ptStyle.startParagraph = StartParagraph.NEXT_ODD_PAGE;
+        try { ptStyle.appliedFont = CFG.fonts.chapter_title; } catch (e3) {}
+    }
+
+    // Part Subtitle style
+    try {
+        doc.paragraphStyles.itemByName(ID_PART_SUBTITLE).name;
+    } catch (e) {
+        var subStyle = doc.paragraphStyles.add({ name: ID_PART_SUBTITLE });
+        subStyle.pointSize = 14;
+        subStyle.justification = Justification.CENTER_ALIGN;
+        subStyle.spaceBefore = "0.1in";
+        subStyle.spaceAfter = "0in";
+        try { subStyle.appliedFont = CFG.fonts.body; } catch (e4) {}
+        try { subStyle.fontStyle = "Italic"; } catch (e5) {}
+    }
+}
+
 function step4_placeDocx(doc) {
     var docxFile = new File(DOCX_PATH);
     if (!docxFile.exists) {
@@ -207,11 +245,13 @@ function step4_placeDocx(doc) {
 function step5_remapStyles(doc) {
     var sChapterNum = getStyle(doc, ID_CHAPTER_NUMBER);
     var sChapterTitle = getStyle(doc, ID_CHAPTER_TITLE);
+    var sPartTitle = getStyle(doc, ID_PART_TITLE);
+    var sPartSubtitle = getStyle(doc, ID_PART_SUBTITLE);
     var sBodyText = getStyle(doc, ID_BODY_TEXT);
     var sSceneBreak = getStyle(doc, ID_SCENE_BREAK);
     var sBodyNoIndent = getStyle(doc, ID_BODY_NO_INDENT);
 
-    var stats = { chapterNumbers: 0, chapterTitles: 0, sceneBreaks: 0, bodyText: 0, firstParas: 0, other: 0 };
+    var stats = { chapterNumbers: 0, chapterTitles: 0, partTitles: 0, partSubtitles: 0, sceneBreaks: 0, bodyText: 0, firstParas: 0, other: 0 };
 
     for (var s = 0; s < doc.stories.length; s++) {
         var paras = doc.stories[s].paragraphs;
@@ -230,11 +270,17 @@ function step5_remapStyles(doc) {
             } else if (styleName === WORD_CHAPTER_TITLE) {
                 targetStyle = sChapterTitle;
                 stats.chapterTitles++;
+            } else if (styleName === WORD_PART_TITLE) {
+                targetStyle = sPartTitle;
+                stats.partTitles++;
+            } else if (styleName === WORD_PART_SUBTITLE) {
+                targetStyle = sPartSubtitle;
+                stats.partSubtitles++;
             } else if (styleName === WORD_SCENE_BREAK) {
                 targetStyle = sSceneBreak;
                 stats.sceneBreaks++;
             } else if (styleName === WORD_NORMAL || styleName === "[Basic Paragraph]" || styleName === "Normal") {
-                if (prevStyleTarget === sChapterTitle || prevStyleTarget === sSceneBreak) {
+                if (prevStyleTarget === sChapterTitle || prevStyleTarget === sSceneBreak || prevStyleTarget === sPartSubtitle || prevStyleTarget === sPartTitle) {
                     targetStyle = sBodyNoIndent;
                     stats.firstParas++;
                 } else {
@@ -245,7 +291,7 @@ function step5_remapStyles(doc) {
 
             if (targetStyle) {
                 para.appliedParagraphStyle = targetStyle;
-                para.clearOverrides(OverrideType.ALL);
+                para.clearOverrides(OverrideType.PARAGRAPH_ONLY);
             } else {
                 stats.other++;
             }
@@ -256,6 +302,8 @@ function step5_remapStyles(doc) {
 
     deleteWordStyle(doc, WORD_CHAPTER_NUMBER, sBodyText);
     deleteWordStyle(doc, WORD_CHAPTER_TITLE, sBodyText);
+    deleteWordStyle(doc, WORD_PART_TITLE, sBodyText);
+    deleteWordStyle(doc, WORD_PART_SUBTITLE, sBodyText);
     deleteWordStyle(doc, WORD_SCENE_BREAK, sBodyText);
 
     return stats;
@@ -266,24 +314,40 @@ function deleteWordStyle(doc, name, replacement) {
 }
 
 function step6_safetyPass(doc) {
+    // Ensure character styles exist — create if missing
     var italicStyle = getCharStyle(doc, ID_ITALIC);
+    if (!italicStyle) {
+        italicStyle = doc.characterStyles.add({ name: ID_ITALIC });
+        italicStyle.fontStyle = "Italic";
+    }
+
     var boldStyle = getCharStyle(doc, ID_BOLD);
-
-    if (italicStyle) {
-        app.findTextPreferences = NothingEnum.NOTHING;
-        app.changeTextPreferences = NothingEnum.NOTHING;
-        app.findTextPreferences.fontStyle = "Italic";
-        app.changeTextPreferences.appliedCharacterStyle = italicStyle;
-        doc.changeText();
+    if (!boldStyle) {
+        boldStyle = doc.characterStyles.add({ name: ID_BOLD });
+        boldStyle.fontStyle = "Bold";
     }
 
-    if (boldStyle) {
-        app.findTextPreferences = NothingEnum.NOTHING;
-        app.changeTextPreferences = NothingEnum.NOTHING;
-        app.findTextPreferences.fontStyle = "Bold";
-        app.changeTextPreferences.appliedCharacterStyle = boldStyle;
-        doc.changeText();
-    }
+    // Pass 1: Find text with fontStyle "Italic" override, apply Italic character style
+    app.findTextPreferences = NothingEnum.NOTHING;
+    app.changeTextPreferences = NothingEnum.NOTHING;
+    app.findTextPreferences.fontStyle = "Italic";
+    app.changeTextPreferences.appliedCharacterStyle = italicStyle;
+    doc.changeText();
+
+    // Pass 2: Find text with fontStyle "Bold" override, apply Bold character style
+    app.findTextPreferences = NothingEnum.NOTHING;
+    app.changeTextPreferences = NothingEnum.NOTHING;
+    app.findTextPreferences.fontStyle = "Bold";
+    app.changeTextPreferences.appliedCharacterStyle = boldStyle;
+    doc.changeText();
+
+    // Pass 3: Find text with fontStyle "Bold Italic", apply both
+    app.findTextPreferences = NothingEnum.NOTHING;
+    app.changeTextPreferences = NothingEnum.NOTHING;
+    app.findTextPreferences.fontStyle = "Bold Italic";
+    app.changeTextPreferences.appliedCharacterStyle = italicStyle;
+    app.changeTextPreferences.fontStyle = "Bold Italic";
+    doc.changeText();
 
     app.findTextPreferences = NothingEnum.NOTHING;
     app.changeTextPreferences = NothingEnum.NOTHING;

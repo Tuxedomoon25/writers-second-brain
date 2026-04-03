@@ -49,7 +49,57 @@ Score each dimension on a 1-10 scale against the user's configured thresholds.
 - Check each rule explicitly (tense, adverbs, metaphor density, etc.)
 - Flag specific violations with line references
 
-### Step 3: Humanizer Scan
+### Step 3: Prose Mechanics Scan
+
+Perform a quantitative analysis of the passage. Count precisely — do not estimate.
+
+**Adverb count**: Count every word ending in -ly. Exclude these non-adverbs: only, early, family, lonely, holy, likely, reply, apply, multiply, supply, fly, rely, ally, belly, bully, folly, fully, gully, hilly, jelly, jolly, rally, silly, tally, ugly, Italy, July. Target: **0** (Rule 4: Verb Supremacy).
+
+**Passive voice count**: Count instances of (was/were/is/are/been/being) followed by a past participle. Target: **0**. Flag each with an active rewrite suggestion.
+
+**"Felt/realized/knew" count**: Count instances of named-emotion verbs: felt, realized, knew, noticed, understood, recognized, sensed, thought, believed, decided, wondered. Target: **0** (Rule 3: Show Don't Tell). Flag each with a somatic alternative.
+
+**Metaphor density**: For each paragraph, count distinct metaphors or similes. Flag any paragraph with >1 metaphor (Rule 5: Metaphor Limit).
+
+**Negative constructions**: Count "wasn't", "didn't", "couldn't", "wouldn't", "shouldn't", "isn't", "aren't", "don't", "won't", "no", "not", "never", "nothing", "nowhere", "none". Exclude passages involving Mist, Weaver, or existential horror where absence IS the point (Rule 6 exception). Flag each with a positive rewrite.
+
+**Sentence length distribution**: Count words per sentence across the full passage. Calculate:
+- Total sentence count
+- Average sentence length (words)
+- Standard deviation of sentence lengths (higher = more rhythmic variety)
+- Count of HARD sentences (>25 words)
+- Count of VERY HARD sentences (>35 words)
+- Flag if std dev < 3.0 as MONOTONOUS (Rule 10: Paragraph Wave)
+
+**Readability**: Calculate Flesch-Kincaid grade level. Formula: `0.39 × (words/sentences) + 11.8 × (syllables/words) - 15.59`. Report as informational only (fiction readability varies by intent).
+
+**Present as a table in the review output:**
+
+```markdown
+### Prose Mechanics
+
+| Metric | Count | Target | Status |
+|--------|-------|--------|--------|
+| -ly Adverbs | [N] | 0 | [PASS/FAIL] |
+| Passive Voice | [N] | 0 | [PASS/FAIL] |
+| "Felt/realized/knew" | [N] | 0 | [PASS/FAIL] |
+| Metaphor overload (paragraphs) | [N] | 0 | [PASS/FAIL] |
+| Negative constructions | [N] | Report | — |
+| Avg sentence length | [N] words | — | — |
+| Sentence rhythm (std dev) | [N] | >3.0 | [PASS/MONOTONOUS] |
+| Hard sentences (>25 words) | [N] | Report | — |
+| Very hard sentences (>35 words) | [N] | Report | — |
+| Readability (Flesch-Kincaid) | [score] | Report | Grade [X] |
+
+**Flagged items:**
+- [For each adverb: quote the sentence, bold the adverb, suggest a stronger verb]
+- [For each passive: quote, suggest active rewrite]
+- [For each felt/realized/knew: quote, suggest somatic alternative]
+- [For each metaphor overload: quote the paragraph, identify the competing metaphors]
+- [For each negative: quote, suggest positive assertion]
+```
+
+### Step 4: Humanizer Scan
 
 Check for AI-typical patterns:
 - AI vocabulary ("additionally", "testament", "landscape", "delve", "tapestry", "pivotal")
@@ -62,7 +112,7 @@ Check for AI-typical patterns:
 
 For Dutch: also check for Dutch AI vocabulary ("bovendien", "daarnaast", "het is belangrijk op te merken")
 
-### Step 4: Present Results
+### Step 5: Present Results
 
 ```markdown
 ## Scene Review: [Scene Title or Description]
@@ -87,6 +137,24 @@ For Dutch: also check for Dutch AI vocabulary ("bovendien", "daarnaast", "het is
   - Line: "[quote from passage]"
   - Suggestion: [How to fix]
 
+### Prose Mechanics
+
+| Metric | Count | Target | Status |
+|--------|-------|--------|--------|
+| -ly Adverbs | [N] | 0 | [PASS/FAIL] |
+| Passive Voice | [N] | 0 | [PASS/FAIL] |
+| "Felt/realized/knew" | [N] | 0 | [PASS/FAIL] |
+| Metaphor overload (paragraphs) | [N] | 0 | [PASS/FAIL] |
+| Negative constructions | [N] | Report | — |
+| Avg sentence length | [N] words | — | — |
+| Sentence rhythm (std dev) | [N] | >3.0 | [PASS/MONOTONOUS] |
+| Hard sentences (>25 words) | [N] | Report | — |
+| Very hard sentences (>35 words) | [N] | Report | — |
+| Readability (Flesch-Kincaid) | [score] | Report | Grade [X] |
+
+**Flagged items:**
+- [Line/quote for each adverb, passive, felt/realized/knew, with suggestion]
+
 ### Humanizer Flags
 [For each AI-typical pattern found:]
 - **[Pattern type]**: "[flagged text]" → Suggestion: [alternative]
@@ -95,7 +163,7 @@ For Dutch: also check for Dutch AI vocabulary ("bovendien", "daarnaast", "het is
 [1-3 actionable next steps, prioritized by impact]
 ```
 
-### Step 5: Save to Experiences
+### Step 6: Save to Experiences
 
 If reviewing a scene from the vault, save the review to:
 `experiences/scenes/[act-chapter-scene]/quality-review.md`

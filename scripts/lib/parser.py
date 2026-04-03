@@ -311,13 +311,21 @@ def extract_nonfiction_prose(filepath: str, chapters_config: list = None) -> lis
             i += 1
             continue
 
-        # Skip markdown tables (preserve as-is in nonfiction? For now skip)
+        # Skip markdown tables
         if stripped.startswith('|') and '|' in stripped[1:]:
             i += 1
             continue
 
+        # Bullet list items (strip '- ' prefix, preserve formatting)
+        if stripped.startswith('- '):
+            item_text = stripped[2:].strip()
+            if item_text:
+                elements.append(('list_item', item_text))
+            i += 1
+            continue
+
         # Regular paragraph — check for citation markers
-        citation_pattern = r'\[@[\w.]+(?:,\s*(?:p+\.\s*[\d,\s-]+))?\]'
+        citation_pattern = r'\[@[\w.]+(?:,\s*[^\]]+)?\]'
         citations = re.findall(citation_pattern, stripped)
         if citations:
             elements.append(('citation', stripped, citations))
@@ -369,13 +377,13 @@ def add_formatted_text(paragraph, text: str):
 
 
 def strip_citations_for_text(text: str) -> str:
-    """Remove [@Author.Work, p. X] citation markers from text for display."""
-    return re.sub(r'\s*\[@[\w.]+(?:,\s*(?:p+\.\s*[\d,\s-]+))?\]', '', text)
+    """Remove [@Author.Work, ...] citation markers from text for display."""
+    return re.sub(r'\s*\[@[\w.]+(?:,\s*[^\]]+)?\]', '', text)
 
 
 def extract_citation_refs(text: str) -> list:
-    """Extract citation references from text as list of (author, work, pages) tuples."""
-    pattern = r'\[@([\w]+)\.([\w]+)(?:,\s*(?:p+\.\s*([\d,\s-]+)))?\]'
+    """Extract citation references from text as list of (author, work, locator) tuples."""
+    pattern = r'\[@([\w]+)\.([\w]+)(?:,\s*(.+?))?\]'
     return re.findall(pattern, text)
 
 
@@ -425,10 +433,13 @@ def generate_indesign_config(config: dict, output_dir: str):
             'body': fonts.get('body', 'Garamond'),
             'chapter_number': fonts.get('chapter_number', 'Cinzel Decorative'),
             'chapter_title': fonts.get('chapter_title', 'Cinzel'),
+            'drop_cap': fonts.get('drop_cap', fonts.get('chapter_number', 'Cinzel Decorative')),
             'quotes': fonts.get('quotes', 'Goldenbook'),
             'headers': fonts.get('headers', 'Cinzel'),
             'folios': fonts.get('folios', 'Goldenbook'),
         },
+        'scene_break_ornament': config.get('scene_break_ornament', '').replace('\\', '/'),
+        'scene_break_ornament_width': config.get('scene_break_ornament_width', 1.0),
         'paths': {
             'output_dir': output_dir.replace('\\', '/'),
             'template_path': config.get('template_path', '').replace('\\', '/'),

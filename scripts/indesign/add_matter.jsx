@@ -43,19 +43,24 @@ function main() {
             (WEBSITE ? WEBSITE + "\r\r" : "") +
             "ISBN: " + ISBN;
 
-        // Frame bounds using inch strings
+        // Build frame bounds dynamically from each page's own margins
+        function pageBounds(page) {
+            var pb = page.bounds;
+            var pm = page.marginPreferences;
+            return [
+                pb[0] + pm.top,
+                pb[1] + pm.left,
+                pb[2] - pm.bottom,
+                pb[3] - pm.right
+            ];
+        }
+
+        // Legacy fallback bounds for pages not yet created
         var frameBounds = [
             CFG.margins.top_in + "in",
             CFG.margins.inside_in + "in",
             (CFG.trim.height_in - CFG.margins.bottom_in) + "in",
             (CFG.trim.width_in - CFG.margins.outside_in) + "in"
-        ];
-
-        var copyrightBounds = [
-            CFG.margins.top_in + "in",
-            CFG.margins.outside_in + "in",
-            (CFG.trim.height_in - CFG.margins.bottom_in) + "in",
-            (CFG.trim.width_in - CFG.margins.inside_in) + "in"
         ];
 
         // Get B-Master
@@ -83,7 +88,7 @@ function main() {
 
         // Page i (recto): Half-title
         var frame1 = doc.pages[0].textFrames.add();
-        frame1.geometricBounds = frameBounds;
+        frame1.geometricBounds = pageBounds(doc.pages[0]);
         frame1.contents = TITLE;
         frame1.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN;
         styleText(frame1.parentStory.texts[0], {
@@ -98,7 +103,7 @@ function main() {
 
         // Page iii (recto): Full title page
         var frame3 = doc.pages[2].textFrames.add();
-        frame3.geometricBounds = frameBounds;
+        frame3.geometricBounds = pageBounds(doc.pages[2]);
         var titleContent = TITLE;
         if (SUBTITLE) titleContent += "\r\r" + SUBTITLE;
         titleContent += "\r\r\r" + AUTHOR;
@@ -130,7 +135,7 @@ function main() {
 
         // Page iv (verso): Copyright
         var frame4 = doc.pages[3].textFrames.add();
-        frame4.geometricBounds = copyrightBounds;
+        frame4.geometricBounds = pageBounds(doc.pages[3]);
         frame4.contents = COPYRIGHT;
         frame4.textFramePreferences.verticalJustification = VerticalJustification.BOTTOM_ALIGN;
         styleText(frame4.parentStory.texts[0], {
@@ -140,7 +145,7 @@ function main() {
         // Page v (recto): Dedication
         if (DEDICATION) {
             var frame5 = doc.pages[4].textFrames.add();
-            frame5.geometricBounds = frameBounds;
+            frame5.geometricBounds = pageBounds(doc.pages[4]);
             frame5.contents = DEDICATION;
             frame5.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN;
             styleText(frame5.parentStory.texts[0], {
@@ -179,7 +184,7 @@ function main() {
         var ackPage = doc.pages.add(LocationOptions.AT_END);
         ackPage.appliedMaster = bMaster;
         var ackFrame = ackPage.textFrames.add();
-        ackFrame.geometricBounds = frameBounds;
+        ackFrame.geometricBounds = pageBounds(ackPage);
         ackFrame.contents = "Acknowledgements\r\r[Your acknowledgements text here]";
         var ackS = ackFrame.parentStory;
         styleText(ackS.paragraphs[0], {
@@ -201,7 +206,7 @@ function main() {
         var aboutPage = doc.pages.add(LocationOptions.AT_END);
         aboutPage.appliedMaster = bMaster;
         var aboutFrame = aboutPage.textFrames.add();
-        aboutFrame.geometricBounds = frameBounds;
+        aboutFrame.geometricBounds = pageBounds(aboutPage);
         aboutFrame.contents = "About the Author\r\r[Your author bio here]";
         var aboutS = aboutFrame.parentStory;
         styleText(aboutS.paragraphs[0], {
@@ -224,7 +229,7 @@ function main() {
             var nextPage = doc.pages.add(LocationOptions.AT_END);
             nextPage.appliedMaster = bMaster;
             var nextFrame = nextPage.textFrames.add();
-            nextFrame.geometricBounds = frameBounds;
+            nextFrame.geometricBounds = pageBounds(nextPage);
             nextFrame.contents = "The story continues\r\r[Teaser text here]";
             nextFrame.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN;
             var nextS = nextFrame.parentStory;

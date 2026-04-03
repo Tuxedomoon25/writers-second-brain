@@ -36,24 +36,26 @@ def convert_citation_to_footnote(paragraph, citation_text: str, refs: list, styl
     """
     Convert citation markers to Word footnotes.
 
-    For 'conversational' style: footnote contains "See [Author], [Work], p. [pages]"
-    For 'academic' style: footnote contains "[Author], [Work], p. [pages]"
+    Handles locator formats: page numbers, chapter refs, essay titles, or none.
     """
-    # Build footnote text from all refs in this paragraph
     footnote_parts = []
-    for author, work, pages in refs:
+    for author, work, locator in refs:
         # Convert CamelCase work title to spaced
         work_spaced = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', work)
-        if pages:
-            if style == 'conversational':
-                footnote_parts.append(f"See {author}, {work_spaced}, p. {pages.strip()}")
+        prefix = "See " if style == 'conversational' else ""
+        if locator:
+            locator = locator.strip()
+            # Page reference (p. 136, pp. 6, 18)
+            if re.match(r'p+\.', locator):
+                footnote_parts.append(f"{prefix}{author}, {work_spaced}, {locator}")
+            # Essay title in quotes ("Myth Became Fact")
+            elif locator.startswith('"'):
+                footnote_parts.append(f"{prefix}{author}, {work_spaced}, {locator}")
+            # Book/Chapter reference (Book II, Ch. 1)
             else:
-                footnote_parts.append(f"{author}, {work_spaced}, p. {pages.strip()}")
+                footnote_parts.append(f"{prefix}{author}, {work_spaced}, {locator}")
         else:
-            if style == 'conversational':
-                footnote_parts.append(f"See {author}, {work_spaced}")
-            else:
-                footnote_parts.append(f"{author}, {work_spaced}")
+            footnote_parts.append(f"{prefix}{author}, {work_spaced}")
 
     return "; ".join(footnote_parts)
 
@@ -104,37 +106,53 @@ def build_atticus_docx(config: dict) -> str:
         if section_name:
             elements = filter_to_section(elements, section_name)
 
-        if not elements:
+        is_part = chapter.get('type') == 'part'
+
+        if not elements and not is_part:
             print(f"  WARNING: No content found for chapter '{chapter_name}'")
             continue
 
-        # Chapter heading (H1)
-        doc.add_heading(chapter_name, level=1)
+        if is_part:
+            # Part divider page: centered title + italic subtitle
+            p = doc.add_heading(chapter_name, level=1)
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for elem in elements:
+                if elem[0] == 'subheading':
+                    p = doc.add_paragraph()
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run = p.add_run(elem[1])
+                    run.italic = True
+        else:
+            # Regular chapter
+            doc.add_heading(chapter_name, level=1)
 
-        for elem in elements:
-            if elem[0] == 'chapter':
-                # Skip — we already added the H1 from config
-                continue
-            elif elem[0] == 'subheading':
-                doc.add_heading(elem[1], level=2)
-            elif elem[0] == 'epigraph':
-                p = doc.add_paragraph()
-                p.style = doc.styles['Normal']
-                run = p.add_run(elem[1])
-                run.italic = True
-            elif elem[0] == 'scene_break':
-                p = doc.add_paragraph()
-                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                p.style = doc.styles['Normal']
-                p.add_run('***')
-            elif elem[0] == 'citation' and has_citations:
-                p = doc.add_paragraph()
-                p.style = doc.styles['Normal']
-                add_paragraph_with_citations(doc, p, elem[1], extract_citation_refs(elem[1]), citation_style)
-            elif elem[0] == 'paragraph':
-                p = doc.add_paragraph()
-                p.style = doc.styles['Normal']
-                add_formatted_text(p, elem[1])
+            for elem in elements:
+                if elem[0] == 'chapter':
+                    continue
+                elif elem[0] == 'subheading':
+                    doc.add_heading(elem[1], level=2)
+                elif elem[0] == 'epigraph':
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    run = p.add_run(elem[1])
+                    run.italic = True
+                elif elem[0] == 'scene_break':
+                    p = doc.add_paragraph()
+                    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                    p.style = doc.styles['Normal']
+                    p.add_run('***')
+                elif elem[0] == 'citation' and has_citations:
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    add_paragraph_with_citations(doc, p, elem[1], extract_citation_refs(elem[1]), citation_style)
+                elif elem[0] == 'list_item':
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['List Bullet']
+                    add_formatted_text(p, elem[1])
+                elif elem[0] == 'paragraph':
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    add_formatted_text(p, elem[1])
 
         # Page break between chapters (except after last)
         if ch_idx < len(chapters) - 1:
@@ -171,6 +189,8 @@ def build_indesign_docx(config: dict) -> str:
     doc = Document()
 
     style_chapter_title = create_custom_style(doc, 'ChapterTitle')
+    style_part_title = create_custom_style(doc, 'PartTitle')
+    style_part_subtitle = create_custom_style(doc, 'PartSubtitle')
     style_scene_break = create_custom_style(doc, 'SceneBreak')
     style_epigraph = create_custom_style(doc, 'Epigraph')
 
@@ -195,40 +215,59 @@ def build_indesign_docx(config: dict) -> str:
         if section_name:
             elements = filter_to_section(elements, section_name)
 
-        if not elements:
+        is_part = chapter.get('type') == 'part'
+
+        if not elements and not is_part:
             print(f"  WARNING: No content found for chapter '{chapter_name}'")
             continue
 
-        # Chapter Title (nonfiction: just the title, no number)
-        p = doc.add_paragraph()
-        p.style = style_chapter_title
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p.add_run(chapter_name)
+        if is_part:
+            # Part divider page: PartTitle + PartSubtitle styles
+            p = doc.add_paragraph()
+            p.style = style_part_title
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.add_run(chapter_name)
+            for elem in elements:
+                if elem[0] == 'subheading':
+                    p = doc.add_paragraph()
+                    p.style = style_part_subtitle
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run = p.add_run(elem[1])
+                    run.italic = True
+        else:
+            # Regular chapter
+            p = doc.add_paragraph()
+            p.style = style_chapter_title
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.add_run(chapter_name)
 
-        for elem in elements:
-            if elem[0] == 'chapter':
-                continue
-            elif elem[0] == 'subheading':
-                # Use Heading 2 for InDesign mapping
-                doc.add_heading(elem[1], level=2)
-            elif elem[0] == 'epigraph':
-                p = doc.add_paragraph()
-                p.style = style_epigraph
-                run = p.add_run(elem[1])
-                run.italic = True
-            elif elem[0] == 'scene_break':
-                p = doc.add_paragraph()
-                p.style = style_scene_break
-                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p.add_run('***')
-            elif elem[0] == 'citation' and has_citations:
-                p = doc.add_paragraph()
-                p.style = doc.styles['Normal']
-                add_paragraph_with_citations(doc, p, elem[1], extract_citation_refs(elem[1]), citation_style)
-            elif elem[0] == 'paragraph':
-                p = doc.add_paragraph()
-                p.style = doc.styles['Normal']
-                add_formatted_text(p, elem[1])
+            for elem in elements:
+                if elem[0] == 'chapter':
+                    continue
+                elif elem[0] == 'subheading':
+                    doc.add_heading(elem[1], level=2)
+                elif elem[0] == 'epigraph':
+                    p = doc.add_paragraph()
+                    p.style = style_epigraph
+                    run = p.add_run(elem[1])
+                    run.italic = True
+                elif elem[0] == 'scene_break':
+                    p = doc.add_paragraph()
+                    p.style = style_scene_break
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    p.add_run('***')
+                elif elem[0] == 'citation' and has_citations:
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    add_paragraph_with_citations(doc, p, elem[1], extract_citation_refs(elem[1]), citation_style)
+                elif elem[0] == 'list_item':
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    add_formatted_text(p, elem[1])
+                elif elem[0] == 'paragraph':
+                    p = doc.add_paragraph()
+                    p.style = doc.styles['Normal']
+                    add_formatted_text(p, elem[1])
 
         if ch_idx < len(chapters) - 1:
             doc.add_page_break()
