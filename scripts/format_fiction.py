@@ -29,12 +29,192 @@ from lib.parser import (
 )
 
 
+def _atticus_centered_paragraph(doc, text, italic=False, bold=False, size=None):
+    """Add a centered paragraph (helper for Atticus front/back matter)."""
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.style = doc.styles['Normal']
+    run = p.add_run(text)
+    if italic:
+        run.italic = True
+    if bold:
+        run.bold = True
+    if size:
+        run.font.size = Pt(size)
+    return p
+
+
+def _atticus_body_paragraph(doc, text, italic=False, center=False):
+    """Add a body paragraph (helper for Atticus front/back matter)."""
+    p = doc.add_paragraph()
+    if center:
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.style = doc.styles['Normal']
+    run = p.add_run(text)
+    if italic:
+        run.italic = True
+    return p
+
+
+def _atticus_add_front_matter(doc, config):
+    """Add front matter pages: title, copyright, dedication."""
+    title = config.get('title', '')
+    subtitle = config.get('subtitle', '')
+    author = config.get('author', '')
+    website = config.get('website', '')
+    isbn = config.get('isbn', '')
+    dedication = config.get('dedication', '')
+    copyright_text = config.get('copyright', '')
+
+    # Title page
+    _atticus_centered_paragraph(doc, '', size=24)
+    _atticus_centered_paragraph(doc, '', size=24)
+    _atticus_centered_paragraph(doc, title, bold=True, size=28)
+    if subtitle:
+        _atticus_centered_paragraph(doc, '', size=12)
+        _atticus_centered_paragraph(doc, subtitle, italic=True, size=14)
+    _atticus_centered_paragraph(doc, '', size=12)
+    _atticus_centered_paragraph(doc, '', size=12)
+    _atticus_centered_paragraph(doc, author, size=14)
+    doc.add_page_break()
+
+    # Copyright page
+    if copyright_text:
+        for line in copyright_text.split('\n'):
+            line = line.strip()
+            if line:
+                p = doc.add_paragraph()
+                p.style = doc.styles['Normal']
+                run = p.add_run(line)
+                run.font.size = Pt(9)
+            else:
+                doc.add_paragraph()
+        if website:
+            p = doc.add_paragraph()
+            run = p.add_run(website)
+            run.font.size = Pt(9)
+        if isbn:
+            p = doc.add_paragraph()
+            run = p.add_run(f'ISBN: {isbn}')
+            run.font.size = Pt(9)
+        doc.add_page_break()
+
+    # Dedication page
+    if dedication:
+        _atticus_centered_paragraph(doc, '', size=12)
+        _atticus_centered_paragraph(doc, '', size=12)
+        _atticus_centered_paragraph(doc, '', size=12)
+        for line in dedication.split('\n'):
+            if line.strip():
+                _atticus_centered_paragraph(doc, line.strip(), italic=True, size=14)
+        doc.add_page_break()
+
+
+def _atticus_add_back_matter(doc, config):
+    """Add back matter pages: epilogue, about author, newsletter, coming next, also by."""
+    epilogue = config.get('epilogue', '')
+    bm = config.get('back_matter', {}) or {}
+
+    # Epilogue
+    if epilogue:
+        doc.add_page_break()
+        doc.add_heading('Epilogue', level=1)
+        for line in epilogue.split('\n'):
+            line = line.strip()
+            if line:
+                _atticus_body_paragraph(doc, line)
+
+    # About the Author
+    about = bm.get('about_author', '')
+    if about:
+        doc.add_page_break()
+        doc.add_heading('About the Author', level=1)
+        for line in about.split('\n'):
+            line = line.strip()
+            if line:
+                _atticus_body_paragraph(doc, line)
+
+    # Newsletter / Stay in the Sung World
+    nl = bm.get('newsletter')
+    if nl:
+        doc.add_page_break()
+        if nl.get('heading'):
+            doc.add_heading(nl['heading'], level=1)
+        if nl.get('body'):
+            for line in nl['body'].split('\n'):
+                line = line.strip()
+                if line:
+                    _atticus_body_paragraph(doc, line, italic=True, center=True)
+        if nl.get('url'):
+            _atticus_centered_paragraph(doc, '', size=12)
+            _atticus_centered_paragraph(doc, nl['url'], bold=True, size=12)
+
+    # Coming Next
+    cn = bm.get('coming_next')
+    if cn:
+        doc.add_page_break()
+        if cn.get('heading'):
+            doc.add_heading(cn['heading'], level=1)
+        if cn.get('body'):
+            for line in cn['body'].split('\n'):
+                line = line.strip()
+                if line:
+                    _atticus_body_paragraph(doc, line, italic=True, center=True)
+        _atticus_centered_paragraph(doc, '', size=12)
+        if cn.get('book_label'):
+            _atticus_centered_paragraph(doc, cn['book_label'], bold=True, size=14)
+        if cn.get('series_label'):
+            _atticus_centered_paragraph(doc, cn['series_label'], size=11)
+        if cn.get('coming_label'):
+            _atticus_centered_paragraph(doc, cn['coming_label'], italic=True, size=11)
+
+    # Also By
+    ab = bm.get('also_by')
+    if ab:
+        doc.add_page_break()
+        if ab.get('heading'):
+            doc.add_heading(ab['heading'], level=1)
+        if ab.get('cycle_label'):
+            _atticus_centered_paragraph(doc, '', size=10)
+            _atticus_centered_paragraph(doc, ab['cycle_label'], bold=True, size=11)
+        for title in ab.get('cycle_titles', []) or []:
+            _atticus_centered_paragraph(doc, title, italic=True, size=13)
+        if ab.get('cycle_subline'):
+            _atticus_centered_paragraph(doc, ab['cycle_subline'], size=10)
+        if ab.get('cycle_tagline'):
+            _atticus_centered_paragraph(doc, '', size=10)
+            for line in ab['cycle_tagline'].split('\n'):
+                line = line.strip()
+                if line:
+                    _atticus_centered_paragraph(doc, line, italic=True, size=11)
+        if ab.get('nonfiction_label'):
+            _atticus_centered_paragraph(doc, '', size=10)
+            _atticus_centered_paragraph(doc, ab['nonfiction_label'], bold=True, size=11)
+        for title in ab.get('nonfiction_titles', []) or []:
+            _atticus_centered_paragraph(doc, title, italic=True, size=13)
+        if ab.get('closing_tagline'):
+            _atticus_centered_paragraph(doc, '', size=10)
+            _atticus_centered_paragraph(doc, '', size=10)
+            for line in ab['closing_tagline'].split('\n'):
+                line = line.strip()
+                if line:
+                    _atticus_centered_paragraph(doc, line, italic=True, size=11)
+        if ab.get('url'):
+            _atticus_centered_paragraph(doc, '', size=10)
+            _atticus_centered_paragraph(doc, ab['url'], bold=True, size=12)
+
+
 def build_atticus_docx(config: dict) -> str:
     """
     Build Atticus-format .docx: H1 chapter names, H2 scene names, *** scene breaks.
+    Includes front matter (title, copyright, dedication) and back matter
+    (epilogue, about author, newsletter, coming next, also by) from the config.
     Returns the output path.
     """
     doc = Document()
+
+    # Front matter
+    _atticus_add_front_matter(doc, config)
 
     vault_path = config['vault_path']
     manuscript_path = config['manuscript_path']
@@ -60,7 +240,8 @@ def build_atticus_docx(config: dict) -> str:
 
         for elem in elements:
             if elem[0] == 'heading':
-                doc.add_heading(elem[1], level=2)
+                # Scene headings removed — chapter name is sufficient
+                continue
             elif elem[0] == 'scene_break':
                 p = doc.add_paragraph()
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -74,6 +255,9 @@ def build_atticus_docx(config: dict) -> str:
         # Page break between chapters (except after last)
         if ch_idx < len(chapters) - 1:
             doc.add_page_break()
+
+    # Back matter
+    _atticus_add_back_matter(doc, config)
 
     # Build output path
     title_slug = config['title'].replace(' ', '_')
@@ -151,15 +335,23 @@ def build_indesign_docx(config: dict) -> str:
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.add_run(ch_name)
 
+        # Collapse consecutive scene_break + heading pairs into single scene_break
+        # (headings are skipped for print, so scene_break before heading is redundant)
+        filtered = []
         for elem in elements:
             if elem[0] == 'heading':
-                # Scene headings REMOVED for print
-                continue
-            elif elem[0] == 'scene_break':
+                continue  # Scene headings REMOVED for print
+            if elem[0] == 'scene_break' and filtered and filtered[-1][0] == 'scene_break':
+                continue  # Skip duplicate consecutive scene breaks
+            filtered.append(elem)
+
+        for elem in filtered:
+            if elem[0] == 'scene_break':
+                # Whitespace-only paragraph to trigger drop cap on next paragraph
                 p = doc.add_paragraph()
                 p.style = style_scene_break
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p.add_run('***')
+                p.add_run('\u2009')  # thin space — gives paragraph height in InDesign
             elif elem[0] == 'paragraph':
                 p = doc.add_paragraph()
                 p.style = doc.styles['Normal']

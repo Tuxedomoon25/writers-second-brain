@@ -410,6 +410,8 @@ def generate_indesign_config(config: dict, output_dir: str):
         'website': config.get('website', ''),
         'isbn': config.get('isbn', '[ISBN-13 NUMBER]'),
         'dedication': config.get('dedication', ''),
+        'epilogue': config.get('epilogue', ''),
+        'back_matter': config.get('back_matter', {}),
         'structure': config.get('structure', 'act-chapter-scene'),
         'scene_titles_in_print': config.get('scene_titles_in_print', False),
 
@@ -440,6 +442,7 @@ def generate_indesign_config(config: dict, output_dir: str):
         },
         'scene_break_ornament': config.get('scene_break_ornament', '').replace('\\', '/'),
         'scene_break_ornament_width': config.get('scene_break_ornament_width', 1.0),
+        'publisher_logo': config.get('publisher_logo', '').replace('\\', '/'),
         'paths': {
             'output_dir': output_dir.replace('\\', '/'),
             'template_path': config.get('template_path', '').replace('\\', '/'),
